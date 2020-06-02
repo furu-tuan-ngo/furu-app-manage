@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>FURU_PayslipAttachment_Name</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>FURU_PayslipAttachment_Name</shortDescription>
+        <value>Payslip {0} - {1}.pdf</value>
+    </labels>
+    <labels>
+        <fullName>FURU_PayslipSubject</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>FURU_PayslipSubject</shortDescription>
+        <value>[FURUCRM VN] - PAYSLIP {0} - {1}</value>
+    </labels>
+    <labels>
+        <fullName>furu_ContractDetailFormError</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Used in lwc when value of form is not valid</shortDescription>
+        <value>Value invalid</value>
+    </labels>
+    <labels>
+        <fullName>furu_ContractDetailFormExchangeRate</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Convert JPY to VND</shortDescription>
+        <value>210</value>
+    </labels>
+    <labels>
+        <fullName>furu_ContractTemplateDescription</fullName>
+        <language>en_US</language>
+        <protected>true</protected>
+        <shortDescription>Use for format Description Field of Contract</shortDescription>
+        <value>Giá trị HĐ của tháng {0} với số tiền là {1} và thanh toán vào ngày {2}</value>
+    </labels>
+</CustomLabels>

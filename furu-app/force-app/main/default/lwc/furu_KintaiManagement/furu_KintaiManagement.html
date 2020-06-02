@@ -1,0 +1,10 @@
+<template>
+    <template if:false={isLoadedCalendar}>
+        <lightning-spinner alternative-text="Loading" size="large"></lightning-spinner>
+    </template>
+    <template if:true={fullCalendarInitialized}>
+        <div class="slds-card slds-p-around_small">
+            <div class="fullcalendar" lwc:dom="manual"></div>
+        </div>
+    </template>
+</template>

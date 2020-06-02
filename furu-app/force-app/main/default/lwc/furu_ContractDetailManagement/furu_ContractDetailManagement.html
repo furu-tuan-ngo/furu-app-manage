@@ -1,0 +1,85 @@
+<template>
+
+    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open slds-modal_small">
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <lightning-button title={label.cancel_button} icon-name="utility:close" variant="base"
+                    class="slds-modal__close slds-button_icon-inverse" onclick={handleCancel}>
+                </lightning-button>
+                <h2 class="slds-modal__title slds-hyphenate">Add</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around_medium">
+                <template if:false={isLoaded}>
+                    <lightning-spinner variant="inverse" alternative-text="Waiting"></lightning-spinner>
+                </template>
+                <div>
+                    <ul class="slds-has-dividers_around-space">
+                        <template iterator:it={listRows}>
+                            <li key={it.value.id} class="slds-item" data-rowid={it.value.id}>
+                                <article class="slds-tile slds-tile_board">
+                                    <div class="slds-tile__detail">
+                                        <lightning-layout multiple-rows="true">
+                                            <template for:each={it.value.fields} for:item="field">
+                                                <template if:true={field.isInputNumber}>
+                                                    <lightning-layout-item key={field.name} size={field.size}
+                                                        padding="around-small">
+                                                        <lightning-input type='number' name={field.name}
+                                                            data-rowid={it.value.id} class={field.class}
+                                                            label={field.label} value={field.value} step={field.step}
+                                                            field-level-help={field.helpText} required={field.required}
+                                                            onblur={handleBlurInput}>
+                                                        </lightning-input>
+                                                    </lightning-layout-item>
+                                                </template>
+                                                <template if:true={field.isCombobox}>
+                                                    <lightning-layout-item key={field.name} size={field.size}
+                                                        padding="around-small">
+                                                        <lightning-combobox data-rowid={it.value.id} class={field.class}
+                                                            label={field.label} value={field.value} name={field.name}
+                                                            options={optionsMonth}
+                                                            required={field.required} onblur={handleBlurInput}>
+                                                        </lightning-combobox>
+                                                    </lightning-layout-item>
+                                                </template>
+                                            </template>
+                                        </lightning-layout>
+                                    </div>
+                                </article>
+                                <div class="slds-clearfix">
+                                    <div class="slds-float_right">
+                                        <template if:true={it.last}>
+                                            <template if:false={it.first}>
+                                                <lightning-button-icon onclick={removeRow} data-rowid={it.value.id}
+                                                    icon-name="action:lead_convert" class="slds-m-left_x-small">
+                                                </lightning-button-icon>
+                                            </template>
+                                            <template if:false={it.value.isMaxRow}>
+                                                <lightning-button-icon onclick={createNewRow} icon-name="action:new"
+                                                    variant="brand" class="slds-m-left_x-small"></lightning-button-icon>
+                                            </template>
+                                        </template>
+                                        <template if:false={it.last}>
+                                            <lightning-button-icon onclick={removeRow} data-rowid={it.value.id}
+                                                icon-name="action:lead_convert" class="slds-m-left_x-small">
+                                            </lightning-button-icon>
+                                        </template>
+                                    </div>
+                                </div>
+
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+            <footer class="slds-modal__footer" style="position: sticky;">
+                <template if:true={isSaving}>
+                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
+                </template>
+                <lightning-button label="Cancel" class="slds-m-horizontal_xx-small" onclick={handleCancel}>
+                </lightning-button>
+                <lightning-button onclick={handleSaveRecord} label="Save" variant="brand"
+                    class="slds-m-horizontal_xx-small"></lightning-button>
+            </footer>
+        </div>
+    </section>
+</template>
