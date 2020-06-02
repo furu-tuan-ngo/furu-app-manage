@@ -132,9 +132,10 @@ export default class RecordFormCreateExample extends LightningElement {
 
     handleSaveRecord() {
         this.isSaving = true;
-        if (this.validateInput('.input-field.default-field')) {
+        const selectorString = '.input-field.default-field';
+        if (this.validateInput(selectorString)) {
             if (!this.checkRowDuplicated()) {
-                const contractValue = this.template.querySelector('.input-field.default-field[data-item="contractValue"]');
+                const contractValue = this.template.querySelector(selectorString + '[data-item="contractValue"]');
                 const totalValue = [...this.template.querySelectorAll('.input-field.dynamic-field.input-number-monthValue')]
                     .reduce((currentValue, inpCmp) => {
                         let valueCmp = (inpCmp.value) ? Number.parseInt(inpCmp.value) : 0;
@@ -157,7 +158,7 @@ export default class RecordFormCreateExample extends LightningElement {
             }
             else {
                 this.isSaving = false;
-                let listIdError = this.getRowDuplicated();
+                const listIdError = this.getRowDuplicated();
                 this.listRowsId.forEach(rowId => {
                     let isError = false;
                     if (listIdError.includes(rowId)) {
@@ -180,9 +181,6 @@ export default class RecordFormCreateExample extends LightningElement {
         }
         // }
 
-    }
-    handleCancel() {
-        this.dispatchEvent(new CustomEvent('closeQA'));
     }
     createContractRecord() {
         const fields = {};
@@ -257,13 +255,13 @@ export default class RecordFormCreateExample extends LightningElement {
         if (input_cpmbobox) {
             input_cpmbobox.className = 'input-field dynamic-field input-combobox slds-has-error';
         }
-
     }
-    elector(selectorString) {
-        return this.template.querySelector(selectorString);
-    }
-    querySelectorAll(selectorString) {
-        return this.template.querySelectorAll(selectorString);
+    getComponent(dataQuery, isAll) {
+        if (isALl) {
+            return this.tempalte.querySelectorAll('.input-field.' + dataQuery);
+        } else {
+            return this.tempalte.querySelector('.input-field.' + dataQuery);
+        }
     }
     formatDataToUpdateDescription(listData) {
         let returnDataList = [];
@@ -285,7 +283,6 @@ export default class RecordFormCreateExample extends LightningElement {
         } else {
             return null;
         }
-
     }
 
     validateInput(selectorString) {
