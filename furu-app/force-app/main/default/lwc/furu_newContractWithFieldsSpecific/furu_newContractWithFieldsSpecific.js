@@ -13,7 +13,7 @@ import getAccounts from '@salesforce/apex/FURU_ContractManagermentController.get
 import getPriceBooks from '@salesforce/apex/FURU_ContractManagermentController.getPriceBooks';
 import getStatusPicklistValues from '@salesforce/apex/FURU_ContractManagermentController.getStatusPicklistValues';
 import templateDescription from '@salesforce/label/c.furu_ContractTemplateDescription';
-
+import { getObjectInfo } from 'lightning/uiObjectInfoApi';
 import USER_ID from '@salesforce/user/Id'
 import NAME_FIELD from '@salesforce/schema/User.Name';
 
@@ -31,38 +31,11 @@ import PRICEBOOK2ID_FIELD from '@salesforce/schema/Contract.Pricebook2Id';
 import CONTRACTNUMBER_FIELD from '@salesforce/schema/Contract.ContractNumber__c';
 import DES_FIELD from '@salesforce/schema/Contract.Description';
 
-import MONTH1_FIELD from '@salesforce/schema/Contract.January__c';
-import MONTH2_FIELD from '@salesforce/schema/Contract.February__c';
-import MONTH3_FIELD from '@salesforce/schema/Contract.March__c';
-import MONTH4_FIELD from '@salesforce/schema/Contract.April__c';
-import MONTH5_FIELD from '@salesforce/schema/Contract.May__c';
-import MONTH6_FIELD from '@salesforce/schema/Contract.June__c';
-import MONTH7_FIELD from '@salesforce/schema/Contract.July__c';
-import MONTH8_FIELD from '@salesforce/schema/Contract.August__c';
-import MONTH9_FIELD from '@salesforce/schema/Contract.September__c';
-import MONTH10_FIELD from '@salesforce/schema/Contract.October__c';
-import MONTH11_FIELD from '@salesforce/schema/Contract.November__c';
-import MONTH12_FIELD from '@salesforce/schema/Contract.December__c';
-
-import EXRATEM1_FIELD from '@salesforce/schema/Contract.ExRateM1__c';
-import EXRATEM2_FIELD from '@salesforce/schema/Contract.ExRateM2__c';
-import EXRATEM3_FIELD from '@salesforce/schema/Contract.ExRateM3__c';
-import EXRATEM4_FIELD from '@salesforce/schema/Contract.ExRateM4__c';
-import EXRATEM5_FIELD from '@salesforce/schema/Contract.ExRateM5__c';
-import EXRATEM6_FIELD from '@salesforce/schema/Contract.ExRateM6__c';
-import EXRATEM7_FIELD from '@salesforce/schema/Contract.ExRateM7__c';
-import EXRATEM8_FIELD from '@salesforce/schema/Contract.ExRateM8__c';
-import EXRATEM9_FIELD from '@salesforce/schema/Contract.ExRateM9__c';
-import EXRATEM10_FIELD from '@salesforce/schema/Contract.ExRateM10__c';
-import EXRATEM11_FIELD from '@salesforce/schema/Contract.ExRateM11__c';
-import EXRATEM12_FIELD from '@salesforce/schema/Contract.ExRateM12__c';
 
 export default class RecordFormCreateExample extends LightningElement {
     isSaving = false;
     YEAR;
-
-    ALL_MONTH = [MONTH1_FIELD, MONTH2_FIELD, MONTH3_FIELD, MONTH4_FIELD, MONTH5_FIELD, MONTH6_FIELD, MONTH7_FIELD, MONTH8_FIELD, MONTH9_FIELD, MONTH10_FIELD, MONTH11_FIELD, MONTH12_FIELD];
-    EXRATE_MONTH = [EXRATEM1_FIELD, EXRATEM2_FIELD, EXRATEM3_FIELD, EXRATEM4_FIELD, EXRATEM5_FIELD, EXRATEM6_FIELD, EXRATEM7_FIELD, EXRATEM8_FIELD, EXRATEM9_FIELD, EXRATEM10_FIELD, EXRATEM11_FIELD, EXRATEM12_FIELD];
+    CONTRACT_INFO;
     accountOption = [];
     pricesBookOption = [];
     pickListStatusOption = [];
@@ -87,7 +60,7 @@ export default class RecordFormCreateExample extends LightningElement {
     }
 
     @wire(getRecord, { recordId: USER_ID, fields: [NAME_FIELD] })
-    wireuser({ error, data }) {
+    getUserCurrent({ error, data }) {
         if (data) {
             this.username = data.fields.Name.value;
         } else if (error) {
@@ -95,7 +68,7 @@ export default class RecordFormCreateExample extends LightningElement {
         }
     }
     @wire(getAccounts, { searchString: '$searchString' })
-    accounts({ data, error }) {
+    getAccounts({ data, error }) {
         if (data) {
             this.accountOption = data;
         } else if (error) {
@@ -103,7 +76,7 @@ export default class RecordFormCreateExample extends LightningElement {
         }
     }
     @wire(getPriceBooks, { searchString: '$searchString' })
-    pricesBook({ data, error }) {
+    getPricesBooks({ data, error }) {
         if (data) {
             this.pricesBookOption = data;
         } else if (error) {
@@ -111,7 +84,7 @@ export default class RecordFormCreateExample extends LightningElement {
         }
     }
     @wire(getStatusPicklistValues)
-    picklistStatusValue({ data, error }) {
+    getPicklistStatusValues({ data, error }) {
         if (data) {
             for (let picklist in data) {
                 this.pickListStatusOption = [...this.pickListStatusOption, { label: picklist, value: picklist }];
@@ -120,6 +93,14 @@ export default class RecordFormCreateExample extends LightningElement {
             console.log(error);
         }
     }
+    @wire(getObjectInfo, { objectApiName: CONTRACT_OBJECT })
+    getContractInfo({ data, error }) {
+        if (data) {
+            this.CONTRACT_INFO = data;
+        } else if (error) {
+            console.log(error);
+        }
+    };
 
     get ownerName() {
         return this.OWNERCONTRACT_FIELD;
@@ -127,23 +108,40 @@ export default class RecordFormCreateExample extends LightningElement {
 
     connectedCallback() {
         this.createNewRow();
-        console.log('changedsss');
     }
 
     handleSaveRecord() {
         this.isSaving = true;
-        const selectorString = '.input-field.default-field';
-        if (this.validateInput(selectorString)) {
+        console.log(this.CONTRACT_INFO);
+        for(const item in this.CONTRACT_INFO.fields){
+            console.log((item));
+        }
+        if (this.validateInput()) {
             if (!this.checkRowDuplicated()) {
-                const contractValue = this.template.querySelector(selectorString + '[data-item="contractValue"]');
-                const totalValue = [...this.template.querySelectorAll('.input-field.dynamic-field.input-number-monthValue')]
+                const contractValue = this.getComponent('[data-item="CONTRACTVALUE_FIELD"]');
+                const totalValue = this.getComponents('input-number-monthValue')
                     .reduce((currentValue, inpCmp) => {
                         let valueCmp = (inpCmp.value) ? Number.parseInt(inpCmp.value) : 0;
                         return currentValue + valueCmp;
                     }, 0);
 
                 if (totalValue <= Number.parseInt(contractValue.value)) {
-                    this.createContractRecord();
+                    const recordCreate = this.getRecordCreate();
+                    console.log(recordCreate);
+                    createRecord(recordCreate)
+                        .then(() => {
+                            this.isSaving = false;
+                            this.dispatchEvent(
+                                new ShowToastEvent({
+                                    title: 'Success',
+                                    message: 'Contract created successfully',
+                                    variant: 'success'
+                                })
+                            );
+                        })
+                        .catch(error => {
+                            console.log(error);
+                        });
                 }
                 else {
                     this.isSaving = false;
@@ -155,10 +153,9 @@ export default class RecordFormCreateExample extends LightningElement {
                         })
                     );
                 }
-            }
-            else {
+            } else {
                 this.isSaving = false;
-                const listIdError = this.getRowDuplicated();
+                let listIdError = this.getRowDuplicated();
                 this.listRowsId.forEach(rowId => {
                     let isError = false;
                     if (listIdError.includes(rowId)) {
@@ -175,71 +172,59 @@ export default class RecordFormCreateExample extends LightningElement {
                     })
                 );
             }
-        }
-        else {
+        } else {
+            console.log('error');
             this.isSaving = false;
         }
-        // }
 
     }
-    createContractRecord() {
+    getRecordCreate() {
         const fields = {};
-        const defaultFieldList = this.template.querySelectorAll('.input-field.default-field');
-        defaultFieldList.forEach((field) => {
+        const defaultFieldList = this.getComponents();
+        const contractInfor = this.CONTRACT_INFO.fields;
+        defaultFieldList.forEach(field => {
             if (field.name == 'STARTDAY_FIELD') {
-                fields[STARTDAY_FIELD.fieldApiName] = field.value;
-                this.YEAR = new Date(field.value).getFullYear();
+                if (field.value) {
+                    fields[contractInfor.StartDate.apiName] = field.value;
+                    this.YEAR = new Date(field.value).getFullYear();
+                }
             }
-            fields[CUSTOMERSIGNEDDATE_FIELD.fieldApiName] = (field.name == 'CUSTOMERSIGNEDDATE_FIELD' && field.value) ? field.value : fields[CUSTOMERSIGNEDDATE_FIELD.fieldApiName];
-            fields[CUSTOMERSIGNEDTITLE_FIELD.fieldApiName] = (field.name == 'CUSTOMERSIGNEDTITLE_FIELD' && field.value) ? field.value : fields[CUSTOMERSIGNEDTITLE_FIELD.fieldApiName];
-            fields[CONTRACTTERM_FIFELD.fieldApiName] = (field.name == 'CONTRACTTERM_FIFELD' && field.value) ? field.value : fields[CONTRACTTERM_FIFELD.fieldApiName];
-            fields[CONTRACTVALUE_FIELD.fieldApiName] = (field.name == 'CONTRACTVALUE_FIELD' && field.value) ? field.value : fields[CONTRACTVALUE_FIELD.fieldApiName];
-            fields[STATUS_FIELD.fieldApiName] = (field.name == 'STATUS_FIELD' && field.value) ? field.value : fields[STATUS_FIELD.fieldApiName];
-            fields[SPECIALTERMS_FIELD.fieldApiName] = (field.name == 'SPECIALTERMS_FIELD' && field.value) ? field.value : fields[SPECIALTERMS_FIELD.fieldApiName];
-            fields[CONTRACTNUMBER_FIELD.fieldApiName] = (field.name == 'CONTRACTNUMBER__c_FIELD' && field.value) ? field.value : fields[CONTRACTNUMBER_FIELD.fieldApiName];
-            fields[STATUS_FIELD.fieldApiName] = (field.name == 'STATUS_FIELD' && field.value) ? field.value : fields[STATUS_FIELD.fieldApiName];
+            fields[contractInfor.CustomerSignedDate.apiName] = (field.name == 'CUSTOMERSIGNEDDATE_FIELD' && field.value) ? field.value : fields[contractInfor.CustomerSignedDate.apiName];
+            fields[contractInfor.CustomerSignedTitle.apiName] = (field.name == 'CUSTOMERSIGNEDTITLE_FIELD' && field.value) ? field.value : fields[contractInfor.CustomerSignedTitle.apiName];
+            fields[contractInfor.ContractTerm.apiName] = (field.name == 'CONTRACTTERM_FIFELD' && field.value) ? field.value : fields[contractInfor.ContractTerm.apiName];
+            fields[contractInfor.ContractValue__c.apiName] = (field.name == 'CONTRACTVALUE_FIELD' && field.value) ? field.value : fields[contractInfor.ContractValue__c.apiName];
+            fields[contractInfor.Status.apiName] = (field.name == 'STATUS_FIELD' && field.value) ? field.value : fields[contractInfor.Status.apiName];
+            fields[contractInfor.SpecialTerms.apiName] = (field.name == 'SPECIALTERMS_FIELD' && field.value) ? field.value : fields[contractInfor.SpecialTerms.apiName];
+            fields[contractInfor.ContractNumber__c.apiName] = (field.name == 'CONTRACTNUMBER__c_FIELD' && field.value) ? field.value : fields[contractInfor.ContractNumber__c.apiName];
         });
-        fields[ACCOUNTID_FIELD.fieldApiName] = this.LOOKUP_FIELDS.Account.Id;
-        fields[PRICEBOOK2ID_FIELD.fieldApiName] = this.LOOKUP_FIELDS.PriceBook.Id;
-        let descriptionDataList = [];
-        this.listRowsId.forEach(rowId => {
-            const selectorString = ('.input-field.dynamic-field[data-rowid="' + rowId + '"]');
-            const comboboxCmp = this.template.querySelector('.input-combobox' + selectorString);
-            const monthValueCmp = this.template.querySelector('.input-number-monthValue' + selectorString);
-            const exrateValueCmp = this.template.querySelector('.input-number-exrateValue' + selectorString);
-            if (comboboxCmp.value && monthValueCmp.value && exrateValueCmp.value) {
-                const index = Number.parseInt(comboboxCmp.value);
-                const fieldMonthApiName = this.ALL_MONTH[index].fieldApiName;
-                const fieldExrateApiName = this.EXRATE_MONTH[index].fieldApiName;
-                const monthValue = monthValueCmp.value;
-                const exrateValue = exrateValueCmp.value;
-                fields[fieldMonthApiName] = monthValue;
-                fields[fieldExrateApiName] = exrateValue;
-                descriptionDataList.push({
-                    monthIndex: index + 1,
-                    monthValue: Number.parseFloat(monthValue),
-                    exrateValue: Number.parseFloat(exrateValue)
-                });
-            }
-        });
-        this.dataToUpdateDescription = [...this.formatDataToUpdateDescription(descriptionDataList)];
+        fields[contractInfor.AccountId.apiName] = this.LOOKUP_FIELDS.Account.Id;
+        fields[contractInfor.Pricebook2Id.apiName] = this.LOOKUP_FIELDS.PriceBook.Id;
+        // let descriptionDataList = [];
+        // this.listRowsId.forEach(rowId => {
+        //     const selectorString = ('.input-field.[data-rowid="' + rowId + '"]');
+        //     const comboboxCmp = this.template.querySelector('.input-combobox' + selectorString);
+        //     const monthValueCmp = this.template.querySelector('.input-number-monthValue' + selectorString);
+        //     const exrateValueCmp = this.template.querySelector('.input-number-exrateValue' + selectorString);
+        //     if (comboboxCmp.value && monthValueCmp.value && exrateValueCmp.value) {
+        //         const index = Number.parseInt(comboboxCmp.value);
+        //         const fieldMonthApiName = this.ALL_MONTH[index].fieldApiName;
+        //         const fieldExrateApiName = this.EXRATE_MONTH[index].fieldApiName;
+        //         const monthValue = monthValueCmp.value;
+        //         const exrateValue = exrateValueCmp.value;
+        //         fields[fieldMonthApiName] = monthValue;
+        //         fields[fieldExrateApiName] = exrateValue;
+        //         descriptionDataList.push({
+        //             monthIndex: index + 1,
+        //             monthValue: Number.parseFloat(monthValue),
+        //             exrateValue: Number.parseFloat(exrateValue)
+        //         });
+        //     }
+        // });
+        // this.dataToUpdateDescription = [...this.formatDataToUpdateDescription(descriptionDataList)];
+        // const recordCreate = { apiName: CONTRACT_OBJECT.objectApiName, fields };
+        // recordCreate.fields[DES_FIELD.fieldApiName] = this.updateDescriptionField();
         const recordCreate = { apiName: CONTRACT_OBJECT.objectApiName, fields };
-        recordCreate.fields[DES_FIELD.fieldApiName] = this.updateDescriptionField();
-        createRecord(recordCreate)
-            .then(() => {
-                this.isSaving = false;
-                this.handleCancel();
-                this.dispatchEvent(
-                    new ShowToastEvent({
-                        title: 'Success',
-                        message: 'Contract created successfully',
-                        variant: 'success'
-                    })
-                );
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        return recordCreate;
     }
     changeBorderStateListItem(rowId, isError) {
         const selectorString = 'li.slds-item[data-rowid="' + rowId + '"]';
@@ -253,15 +238,20 @@ export default class RecordFormCreateExample extends LightningElement {
         const selectorString = '.input-field[data-rowid="' + rowId + '"]';
         let input_cpmbobox = this.template.querySelector('.input-combobox' + selectorString);
         if (input_cpmbobox) {
-            input_cpmbobox.className = 'input-field dynamic-field input-combobox slds-has-error';
+            input_cpmbobox.className = 'input-field  input-combobox slds-has-error';
         }
+
     }
-    getComponent(dataQuery, isAll) {
-        if (isALl) {
-            return this.tempalte.querySelectorAll('.input-field.' + dataQuery);
-        } else {
-            return this.tempalte.querySelector('.input-field.' + dataQuery);
-        }
+    getComponent(dataQuery) {
+        return this.template.querySelector('.input-field' + dataQuery);
+    }
+    getComponents(dataQuery) {
+        const selectorString = (dataQuery) ? '.input-field.' + dataQuery : '.input-field';
+        const components = [...this.template.querySelectorAll(selectorString)];
+        return components;
+    }
+    querySelectorAll(selectorString) {
+        return this.template.querySelectorAll(selectorString);
     }
     formatDataToUpdateDescription(listData) {
         let returnDataList = [];
@@ -283,19 +273,20 @@ export default class RecordFormCreateExample extends LightningElement {
         } else {
             return null;
         }
+
     }
 
-    validateInput(selectorString) {
+    validateInput() {
         const requiredFieldList = [
             'ACCOUNTID_FIELD',
             'CONTRACTVALUE_FIELD',
             'STARTDAY_FIELD',
             'CONTRACTTERM_FIFELD'
         ];
-        let allValid = [...this.template.querySelectorAll(selectorString)]
+        let allValid = this.getComponents()
             .reduce((validSoFar, inputCmp) => {
                 // handle required fields
-                if (requiredFieldList.includes(inputCmp.dataset.drname)) {
+                if (requiredFieldList.includes(inputCmp.dataset.item)) {
                     if (inputCmp.value) {
                         inputCmp.setCustomValidity('');
                     } else {
@@ -303,7 +294,7 @@ export default class RecordFormCreateExample extends LightningElement {
                     }
                 }
                 //handle STATUS field 
-                if (inputCmp.name == "STATUS_FIELD") {
+                if (inputCmp.name === "STATUS_FIELD") {
                     if (inputCmp.value !== "Draft" && inputCmp.value) {
                         inputCmp.setCustomValidity("Choose a valid contract status and save your changes. Ask your admin for details.");
                     } else if (inputCmp.value) {
@@ -313,34 +304,46 @@ export default class RecordFormCreateExample extends LightningElement {
                 inputCmp.reportValidity();
                 return validSoFar && inputCmp.checkValidity();
             }, true);
-        //handle list Contract detail
+        console.log(allValid);
+        let currentRowid = '';
+        let indexFlag = 1;
+        let asynronus;
         let listIdError = new Set();
-        console.log(this.listRowsId);
-        this.listRowsId.forEach(rowId => {
-            const comboboxCmp = this.template.querySelector('.input-combobox.input-field.dynamic-field[data-rowid="' + rowId + '"]');
-            const numberExrateCmp = this.template.querySelector('.input-number-exrateValue.input-field.dynamic-field[data-rowid="' + rowId + '"]');
-            const numberMonthCmp = this.template.querySelector('.input-number-monthValue.input-field.dynamic-field[data-rowid="' + rowId + '"]');
-            if (!comboboxCmp.value) comboboxCmp.setCustomValidity('Complete this field');
-            if (!numberMonthCmp.value) numberMonthCmp.setCustomValidity('Complete this field');
-            if (!numberExrateCmp.value) numberExrateCmp.setCustomValidity('Complete this field');
-            if ((!comboboxCmp.checkValidity() && !numberExrateCmp.checkValidity() && !numberMonthCmp.checkValidity()) || (comboboxCmp.checkValidity() && numberExrateCmp.checkValidity() && numberMonthCmp.checkValidity())) {
-                comboboxCmp.setCustomValidity('');
-                numberMonthCmp.setCustomValidity('');
-                numberExrateCmp.setCustomValidity('');
+        this.getComponents('input-detail').forEach(inputCmp => {
+            //handle Contract detail
+            if (inputCmp.dataset.rowid !== currentRowid) {
+                asynronus = (inputCmp.value) ? true : false;
+                currentRowid = inputCmp.dataset.rowid;
+                indexFlag = 1;
+            } else {
+                let flag = (inputCmp.value) ? true : false;
+                if (flag !== asynronus) {
+                    listIdError.add(inputCmp.dataset.rowid);
+                    this.changeBorderStateListItem(inputCmp.dataset.rowid, true);
+                } else {
+                    indexFlag++;
+                }
             }
-            else {
-                listIdError.add(rowId);
+            console.log(currentRowid);
+
+            if (indexFlag === 3) {
+                this.changeBorderStateListItem(inputCmp.dataset.rowid, false);
             }
-            comboboxCmp.reportValidity();
-            numberMonthCmp.reportValidity();
-            numberExrateCmp.reportValidity();
         });
-        this.listRowsId.forEach(rowId => {
-            let isError = false;
-            isError = listIdError.has(rowId) ? true : false;
-            this.changeBorderStateListItem(rowId, isError);
+
+        const Cmps = this.getComponents('input-detail');
+        Cmps.forEach(cmp => {
+            cmp.setCustomValidity('');
+            if (listIdError.has(cmp.dataset.rowid)) {
+                if (!cmp.value) {
+                    cmp.setCustomValidity('Complete this field .');
+                }
+            }
+            cmp.reportValidity();
         });
-        allValid = (listIdError.length > 0) ? false : allValid;
+
+        allValid = (listIdError.size > 0) ? false : allValid;
+        console.log(allValid, listIdError.size);
         return allValid;
     }
     removeRow(event) {
@@ -370,7 +373,7 @@ export default class RecordFormCreateExample extends LightningElement {
         this.listRows.push({
             id: rowId,
             fields: [{
-                class: 'input-field dynamic-field input-combobox',
+                class: 'input-field  input-combobox input-detail',
                 name: 'Month' + rowId,
                 label: 'Month',
                 required: false,
@@ -379,7 +382,7 @@ export default class RecordFormCreateExample extends LightningElement {
                 size: 4,
             },
             {
-                class: 'input-field dynamic-field input-number-monthValue',
+                class: 'input-field  input-number-monthValue input-detail',
                 name: 'Value' + rowId,
                 label: 'Value',
                 required: false,
@@ -389,7 +392,7 @@ export default class RecordFormCreateExample extends LightningElement {
                 size: 4,
             },
             {
-                class: 'input-field dynamic-field input-number-exrateValue',
+                class: 'input-field  input-number-exrateValue input-detail',
                 name: 'Exrate' + rowId,
                 label: 'Exrate',
                 required: false,
@@ -402,7 +405,7 @@ export default class RecordFormCreateExample extends LightningElement {
         });
     }
     checkRowDuplicated() {
-        let comboboxCmps = this.template.querySelectorAll('.input-combobox');
+        const comboboxCmps = this.getComponents('input-combobox');
         let comboboxCmpList = [];
         let monthIndexs = new Set();
         comboboxCmps.forEach(row => {
@@ -484,8 +487,8 @@ export default class RecordFormCreateExample extends LightningElement {
         this.searchString = event.target.value;
     }
     handleMonthOptions() {
-        const termCpm = this.template.querySelector('.input-field.default-field[data-term="termNumber"]');
-        const startDateCmp = this.template.querySelector('.input-field.default-field[data-date="startDate"]');
+        const termCpm = this.template.querySelector('.input-field.default-field[data-item="CONTRACTTERM_FIFELD"]');
+        const startDateCmp = this.template.querySelector('.input-field.default-field[data-item="STARTDAY_FIELD"]');
         if (termCpm.value && startDateCmp.value) {
             const termNumber = Number.parseInt(termCpm.value);
             const dateStart = new Date(startDateCmp.value);
@@ -538,7 +541,6 @@ export default class RecordFormCreateExample extends LightningElement {
                     variant: 'error'
                 })
             );
-            this.handleCancel();
             return;
         }
         return stringToFormat.replace(/{(\d+)}/gm, (match, index) =>

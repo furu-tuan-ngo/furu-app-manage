@@ -314,8 +314,9 @@
                                                             padding="around-small">
                                                             <lightning-input type='number' name={field.name}
                                                                 data-rowid={it.value.id} class={field.class}
-                                                                label={field.label} value={field.value}
-                                                                step={field.step} field-level-help={field.helpText}
+                                                                data-item="CONTRACT_DETAIL" label={field.label}
+                                                                value={field.value} step={field.step}
+                                                                field-level-help={field.helpText}
                                                                 required={field.required}>
                                                             </lightning-input>
                                                         </lightning-layout-item>
@@ -324,9 +325,10 @@
                                                         <lightning-layout-item key={field.name} size={field.size}
                                                             padding="around-small">
                                                             <lightning-combobox data-rowid={it.value.id}
-                                                                onfocus={handleMonthOptions} class={field.class}
-                                                                label={field.label} name={field.name}
-                                                                options={monthOptions} required={field.required}>
+                                                                data-item="CONTRACT_DETAIL" onfocus={handleMonthOptions}
+                                                                class={field.class} label={field.label}
+                                                                name={field.name} options={monthOptions}
+                                                                required={field.required}>
                                                             </lightning-combobox>
                                                         </lightning-layout-item>
                                                     </template>
