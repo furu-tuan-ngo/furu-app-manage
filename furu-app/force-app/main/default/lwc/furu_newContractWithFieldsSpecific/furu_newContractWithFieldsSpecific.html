@@ -1,379 +1,187 @@
 <template>
-    <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open slds-modal_small">
-        <div class="slds-modal__container">
-            <header class="slds-modal__header">
-                <lightning-button icon-name="utility:close" variant="base"
-                    class="slds-modal__close slds-button_icon-inverse">
-                </lightning-button>
-                <h2 class="slds-modal__title slds-hyphenate">New Contractx</h2>
-            </header>
-
-            <div class="slds-modal__content slds-p-around_small">
-                <div class="slds-section slds-is-open">
-                    <h3 class="slds-section__title slds-theme_shade">
-                        <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Contract
-                            Information</span>
-                    </h3>
-                    <div aria-hidden="false" class="slds-section__content  slds-p-horizontal_medium">
-                        <div class="slds-form" role="list">
-                            <div class="slds-form__row">
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <label class="slds-form-element__label">
-                                            Contract owner</label>
-                                        <div class="slds-form-element__control slds-text-heading_small">
-                                            {username}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <template if:true={LOOKUP_FIELDS.Account.isValue}>
-                                            <label class="slds-form-element__label" for="combobox-id-5">Account
-                                                Name</label>
-                                        </template>
-                                        <div class="slds-form-element__control">
-                                            <div class="slds-combobox_container slds-has-selection">
-                                                <div class="ACCOUNTID_FIELD_dropdown slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
-                                                    aria-haspopup="listbox" role="combobox">
-                                                    <template if:false={LOOKUP_FIELDS.Account.isValue}>
-                                                        <div class="slds-form-element">
-                                                            <label class="slds-form-element__label">
-                                                                <abbr class="slds-required" title="required">*
-                                                                </abbr>Account Name</label>
-                                                            <div class="slds-form-element__control">
-                                                                <lightning-input onclick={showDropdown}
-                                                                    placeholder="Search accounts" type="search"
-                                                                    name="ACCOUNTID_FIELD" variant="label-hidden"
-                                                                    onkeyup={handleSearchLookupField}
-                                                                    onblur={handleBlurLookupInput}
-                                                                    class="input-field default-field"
-                                                                    data-item="ACCOUNTID_FIELD">
-                                                                </lightning-input>
-                                                            </div>
-                                                        </div>
-
-                                                    </template>
-                                                    <template if:true={LOOKUP_FIELDS.Account.isValue}>
-                                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right"
-                                                            role="none">
-                                                            <span
-                                                                class="slds-icon_container slds-icon-standard-account slds-combobox__input-entity-icon">
-                                                                <lightning-icon icon-name="standard:account"
-                                                                    alternative-text="Connected" size="small"
-                                                                    title="small size">
-                                                                </lightning-icon>
-                                                            </span>
-                                                            <input type="text"
-                                                                class="slds-input slds-combobox__input slds-combobox__input-value"
-                                                                role="textbox" readonly
-                                                                value={LOOKUP_FIELDS.Account.Value} />
-                                                            <button
-                                                                class="slds-button slds-button_icon slds-input__icon slds-input__icon_right"
-                                                                title="Remove selected option">
-                                                                <lightning-icon icon-name="utility:close"
-                                                                    onclick={removeOptionSelected}
-                                                                    data-drname="ACCOUNTID_FIELD"
-                                                                    alternative-text="Connected" size="xx-small" title="Remove selected
-                                                                    option">
-                                                                </lightning-icon>
-                                                            </button>
-                                                        </div>
-                                                    </template>
-                                                    <div class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid"
-                                                        role="listbox">
-                                                        <ul class="slds-listbox slds-listbox_vertical" role="group">
-                                                            <template for:each={accountOption} for:item="account">
-                                                                <li key={account.Id} role="presentation"
-                                                                    class="slds-listbox__item">
-                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center"
-                                                                        role="option">
-                                                                        <span
-                                                                            class="slds-media__figure slds-listbox__option-icon">
-                                                                            <span
-                                                                                class="slds-icon_container slds-icon-standard-account">
-                                                                                <lightning-icon name="demo"
-                                                                                    onclick={handleChooseDropdownValue}
-                                                                                    data-id={account.Id}
-                                                                                    data-drname="ACCOUNTID_FIELD"
-                                                                                    data-dpname={account.Name}
-                                                                                    icon-name="standard:account"
-                                                                                    alternative-text="Connected"
-                                                                                    size="small" title="small size">
-                                                                                </lightning-icon>
-                                                                            </span>
-                                                                        </span>
-                                                                        <span class="slds-media__body">
-                                                                            <span onclick={handleChooseDropdownValue}
-                                                                                data-id={account.Id}
-                                                                                data-drname="ACCOUNTID_FIELD"
-                                                                                data-dpname={account.Name}
-                                                                                class="slds-listbox__option-text slds-listbox__option-text_entity">{account.Name}</span>
-                                                                        </span>
-                                                                    </div>
-                                                                </li>
-                                                            </template>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="slds-form__row">
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <lightning-input type="text" label="Mã HĐ" class="input-field default-field"
-                                            name="CONTRACTNUMBER__c_FIELD">
-                                        </lightning-input>
-                                    </div>
-                                </div>
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <template if:true={LOOKUP_FIELDS.PriceBook.isValue}>
-                                            <label class="slds-form-element__label" for="combobox-id-5">Price
-                                                Book</label>
-                                        </template>
-                                        <div class="slds-form-element__control">
-                                            <div class="slds-combobox_container slds-has-selection">
-                                                <div class="PRICEBOOK2ID_FIELD_dropdown slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click"
-                                                    aria-haspopup="listbox" role="combobox">
-                                                    <template if:false={LOOKUP_FIELDS.PriceBook.isValue}>
-                                                        <lightning-input label="Price Book" onclick={showDropdown}
-                                                            onblur={handleBlurLookupInput} placeholder="Search accounts"
-                                                            type="search" data-item="PRICEBOOK2ID_FIELD"
-                                                            name="PRICEBOOK2ID_FIELD" onkeyup={handleSearchLookupField}
-                                                            class="input-field default-field">
-                                                        </lightning-input>
-                                                    </template>
-                                                    <template if:true={LOOKUP_FIELDS.PriceBook.isValue}>
-                                                        <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right"
-                                                            role="none">
-                                                            <span
-                                                                class="slds-icon_container slds-icon-standard-account slds-combobox__input-entity-icon"
-                                                                title="">
-                                                                <lightning-icon icon-name="standard:pricebook"
-                                                                    alternative-text="Connected" size="small"
-                                                                    title="Price Book">
-                                                                </lightning-icon>
-                                                            </span>
-                                                            <input type="text"
-                                                                class="slds-input slds-combobox__input slds-combobox__input-value"
-                                                                readonly value={LOOKUP_FIELDS.PriceBook.Value} />
-                                                            <button
-                                                                class="slds-button slds-button_icon slds-input__icon slds-input__icon_right">
-                                                                <lightning-icon icon-name="utility:close"
-                                                                    onclick={removeOptionSelected}
-                                                                    data-drname="PRICEBOOK2ID_FIELD"
-                                                                    alternative-text="Connected" size="xx-small"
-                                                                    title="Remove selected option">
-                                                                </lightning-icon>
-                                                            </button>
-                                                        </div>
-                                                    </template>
-                                                    <div class="demo slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid"
-                                                        role="listbox">
-                                                        <ul class="slds-listbox slds-listbox_vertical" role="group">
-                                                            <template for:each={pricesBookOption} for:item="pricebook">
-                                                                <li key={pricebook.Id} role="presentation"
-                                                                    class="slds-listbox__item">
-                                                                    <div class="slds-media slds-listbox__option slds-listbox__option_entity slds-media_center"
-                                                                        role="option">
-                                                                        <span
-                                                                            class="slds-media__figure slds-listbox__option-icon">
-                                                                            <span
-                                                                                class="slds-icon_container slds-icon-standard-account">
-                                                                                <lightning-icon name="demo"
-                                                                                    onclick={handleChooseDropdownValue}
-                                                                                    data-id={pricebook.Id}
-                                                                                    data-drname="PRICEBOOK2ID_FIELD"
-                                                                                    data-dpname={pricebook.Name}
-                                                                                    icon-name="standard:pricebook"
-                                                                                    alternative-text="Connected"
-                                                                                    size="small" title="small size">
-                                                                                </lightning-icon>
-                                                                            </span>
-                                                                        </span>
-                                                                        <span class="slds-media__body">
-                                                                            <span onclick={handleChooseDropdownValue}
-                                                                                data-id={pricebook.Id}
-                                                                                data-drname="PRICEBOOK2ID_FIELD"
-                                                                                data-dpname={pricebook.Name}
-                                                                                class="slds-listbox__option-text slds-listbox__option-text_entity">{pricebook.Name}</span>
-                                                                        </span>
-                                                                    </div>
-                                                                </li>
-                                                            </template>
-                                                        </ul>
-                                                    </div>
-                                                </div>
+    <lightning-record-edit-form object-api-name="Contract" onsuccess={handleSuccess} onsubmit={handleSubmit}>
+        <section role="dialog" tabindex="-1" aria-modal="true" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button icon-name="utility:close" variant="base"
+                        class="slds-modal__close slds-button_icon-inverse" onclick={handleCancel}>
+                    </lightning-button>
+                    <h2 class="slds-modal__title slds-hyphenate">New Contract</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_small">
+                    <template if:true={isSaving}>
+                        <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+                    </template>
+                    <div class="slds-section slds-is-open">
+                        <h3 class="slds-section__title slds-theme_shade">
+                            <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Contract
+                                Information</span>
+                        </h3>
+                        <div aria-hidden="false" class="slds-section__content  slds-p-horizontal_medium">
+                            <div class="slds-form" role="list">
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <label class="slds-form-element__label">
+                                                Contract owner</label>
+                                            <div class="slds-form-element__control slds-text-heading_small">
+                                                {username}
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-
-                            </div>
-                            <div class="slds-form__row">
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <label class="slds-form-element__label" for="STARTDAY_FIELD">
-                                            <abbr class="slds-required" title="required">*
-                                            </abbr>Contract Value</label>
-                                        <div class="slds-form-element__control">
-                                            <lightning-input type="number" step="0.01" class="input-field default-field"
-                                                variant="label-hidden" data-item="CONTRACTVALUE_FIELD"
-                                                name="CONTRACTVALUE_FIELD">
-                                            </lightning-input>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field field-name="AccountId"></lightning-input-field>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <label class="slds-form-element__label" for="STARTDAY_FIELD">
-                                            <abbr class="slds-required" title="required">*
-                                            </abbr>Contract Term</label>
-                                        <div class="slds-form-element__control">
-                                            <lightning-input data-date="startDate" type="number" step="1"
-                                                data-item="CONTRACTTERM_FIFELD" variant="label-hidden"
-                                                class="input-field default-field" name="CONTRACTTERM_FIFELD">
-                                            </lightning-input>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field field-name="ContractNumber__c">
+                                            </lightning-input-field>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field field-name="Pricebook2Id">
+                                            </lightning-input-field>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="slds-form__row">
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <lightning-input type="date" class="input-field default-field"
-                                            data-item="CUSTOMERSIGNEDDATE_FIELD" name="CUSTOMERSIGNEDDATE_FIELD"
-                                            label="Contract Signed Date">
-                                        </lightning-input>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field required field-name="ContractValue__c">
+                                            </lightning-input-field>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <lightning-input type="text" class="input-field default-field"
-                                            data-item="CUSTOMERSIGNEDTITLE_FIELD" name="CUSTOMERSIGNEDTITLE_FIELD"
-                                            label="Contract Signed Title">
-                                        </lightning-input>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="slds-form__row">
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <label class="slds-form-element__label" for="STARTDAY_FIELD">
-                                            <abbr class="slds-required" title="required">*
-                                            </abbr>Contract Start Date</label>
-                                        <div class="slds-form-element__control">
-                                            <lightning-input type="date" data-item="STARTDAY_FIELD"
-                                                variant="label-hidden" class="input-field default-field"
-                                                name="STARTDAY_FIELD">
-                                            </lightning-input>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field onchange={handleChangeTerm} required
+                                                field-name="ContractTerm">
+                                            </lightning-input-field>
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <lightning-combobox name="STATUS_FIELD" label="Status" value="Draft"
-                                            data-item="STATUS_FIELD" options={pickListStatusOption}
-                                            class="input-field default-field">
-                                        </lightning-combobox>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <div class="slds-form-element slds-form-element_stacked">
+                                                <lightning-input-field field-name="CustomerSignedDate">
+                                                </lightning-input-field>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field field-name="CustomerSignedTitle">
+                                            </lightning-input-field>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="slds-form__row">
-                                <div class="slds-form__item" role="listitem">
-                                    <div class="slds-form-element slds-form-element_stacked">
-                                        <lightning-textarea class="input-field default-field" name="SPECIALTERMS_FIELD"
-                                            data-item="SPECIALTERMS_FIELD" label="Special Term"></lightning-textarea>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field required onchange={handleChangeStartDate}
+                                                field-name="StartDate">
+                                            </lightning-input-field>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field required
+                                                field-name="Status"></lightning-input-field>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form__row">
+                                    <div class="slds-form__item" role="listitem">
+                                        <div class="slds-form-element slds-form-element_stacked">
+                                            <lightning-input-field field-name="SpecialTerms"></lightning-input-field>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="slds-section slds-is-open">
-                    <h3 class="slds-section__title slds-theme_shade">
-                        <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Contract Detail</span>
-                    </h3>
-                    <div class="slds-section__content slds-p-horizontal_medium">
-                        <ul class="slds-has-dividers_around-space">
-                            <template iterator:it={listRows}>
-                                <li key={it.value.id} class="slds-item borderError" data-rowid={it.value.id}>
-                                    <article class="slds-tile slds-tile_board">
-                                        <div class="slds-tile__detail">
-                                            <lightning-layout multiple-rows="true">
-                                                <template for:each={it.value.fields} for:item="field">
-                                                    <template if:true={field.isInputNumber}>
-                                                        <lightning-layout-item key={field.name} size={field.size}
-                                                            padding="around-small">
-                                                            <lightning-input type='number' name={field.name}
-                                                                data-rowid={it.value.id} class={field.class}
-                                                                data-item="CONTRACT_DETAIL" label={field.label}
-                                                                value={field.value} step={field.step}
-                                                                field-level-help={field.helpText}
-                                                                required={field.required}>
-                                                            </lightning-input>
-                                                        </lightning-layout-item>
+                    <div class="slds-section slds-is-open">
+                        <h3 class="slds-section__title slds-theme_shade">
+                            <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Contract
+                                Detail</span>
+                        </h3>
+                        <div class="slds-section__content slds-p-horizontal_medium">
+                            <ul class="slds-has-dividers_around-space">
+                                <template iterator:it={listRows}>
+                                    <li key={it.value.id} class="slds-item borderError" data-rowid={it.value.id}>
+                                        <article class="slds-tile slds-tile_board">
+                                            <div class="slds-tile__detail">
+                                                <lightning-layout multiple-rows="true">
+                                                    <template for:each={it.value.fields} for:item="field">
+                                                        <template if:true={field.isInputNumber}>
+                                                            <lightning-layout-item key={field.name} size={field.size}
+                                                                padding="around-small">
+                                                                <lightning-input type='number' name={field.name}
+                                                                    data-rowid={it.value.id} class={field.class}
+                                                                    data-item="CONTRACT_DETAIL" label={field.label}
+                                                                    value={field.value} step={field.step}
+                                                                    field-level-help={field.helpText}
+                                                                    required={field.required}>
+                                                                </lightning-input>
+                                                            </lightning-layout-item>
+                                                        </template>
+                                                        <template if:true={field.isCombobox}>
+                                                            <lightning-layout-item key={field.name} size={field.size}
+                                                                padding="around-small">
+                                                                <lightning-combobox data-rowid={it.value.id}
+                                                                    data-item="CONTRACT_DETAIL"
+                                                                    onfocus={handleMonthOptions} class={field.class}
+                                                                    label={field.label} name={field.name}
+                                                                    options={field.option} required={field.required}>
+                                                                </lightning-combobox>
+                                                            </lightning-layout-item>
+                                                        </template>
                                                     </template>
-                                                    <template if:true={field.isCombobox}>
-                                                        <lightning-layout-item key={field.name} size={field.size}
-                                                            padding="around-small">
-                                                            <lightning-combobox data-rowid={it.value.id}
-                                                                data-item="CONTRACT_DETAIL" onfocus={handleMonthOptions}
-                                                                class={field.class} label={field.label}
-                                                                name={field.name} options={monthOptions}
-                                                                required={field.required}>
-                                                            </lightning-combobox>
-                                                        </lightning-layout-item>
+                                                </lightning-layout>
+                                            </div>
+                                        </article>
+                                        <div class="slds-clearfix">
+                                            <div class="slds-float_right">
+                                                <template if:true={it.last}>
+                                                    <template if:false={it.first}>
+                                                        <lightning-button-icon onclick={removeRow}
+                                                            data-rowid={it.value.id} icon-name="action:lead_convert"
+                                                            class="slds-m-left_x-small">
+                                                        </lightning-button-icon>
+                                                    </template>
+                                                    <template if:false={it.value.isMaxRow}>
+                                                        <lightning-button-icon onclick={createNewRow}
+                                                            icon-name="action:new" variant="brand"
+                                                            class="slds-m-left_x-small">
+                                                        </lightning-button-icon>
                                                     </template>
                                                 </template>
-                                            </lightning-layout>
-                                        </div>
-                                    </article>
-                                    <div class="slds-clearfix">
-                                        <div class="slds-float_right">
-                                            <template if:true={it.last}>
-                                                <template if:false={it.first}>
+                                                <template if:false={it.last}>
                                                     <lightning-button-icon onclick={removeRow} data-rowid={it.value.id}
                                                         icon-name="action:lead_convert" class="slds-m-left_x-small">
                                                     </lightning-button-icon>
                                                 </template>
-                                                <template if:false={it.value.isMaxRow}>
-                                                    <lightning-button-icon onclick={createNewRow} icon-name="action:new"
-                                                        variant="brand" class="slds-m-left_x-small">
-                                                    </lightning-button-icon>
-                                                </template>
-                                            </template>
-                                            <template if:false={it.last}>
-                                                <lightning-button-icon onclick={removeRow} data-rowid={it.value.id}
-                                                    icon-name="action:lead_convert" class="slds-m-left_x-small">
-                                                </lightning-button-icon>
-                                            </template>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                </li>
-                            </template>
-                        </ul>
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
                     </div>
                 </div>
-
+                <footer class="slds-modal__footer" style="position: sticky;">
+                    <lightning-button label="Cancel" class="slds-m-horizontal_xx-small" onclick={handleCancel}></lightning-button>
+                    <lightning-button type="submit" variant="brand" label="Update record"
+                        class="slds-m-horizontal_xx-small">
+                    </lightning-button>
+                </footer>
             </div>
-            <footer class="slds-modal__footer" style="position: sticky;">
-                <template if:true={isSaving}>
-                    <lightning-spinner alternative-text="Loading" size="small"></lightning-spinner>
-                </template>
-                <lightning-button label="Cancel" class="slds-m-horizontal_xx-small"></lightning-button>
-                <lightning-button label="Save" onclick={handleSaveRecord} variant="brand"
-                    class="slds-m-horizontal_xx-small"></lightning-button>
-            </footer>
-        </div>
-    </section>
-    <div class="slds-backdrop slds-backdrop_open"></div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </lightning-record-edit-form>
 </template>

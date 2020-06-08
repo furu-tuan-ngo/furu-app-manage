@@ -111,37 +111,4 @@ public with sharing class FURU_ContractManagermentController {
         // prepend currency symbol
         Return d.format() + ' VND';
     }
-    
-    @AuraEnabled(cacheable=true)
-    public static List<Account> getAccounts (String searchString) {
-        searchString = '%'+String.escapeSingleQuotes(searchString)+'%';
-        return [SELECT Name,Id FROM Account WHERE Name LIKE :searchString ORDER BY Name LIMIT 5];
-    }
-
-    @AuraEnabled(cacheable=true)
-    public static List<Pricebook2> getPriceBooks(String searchString){
-        searchString = '%'+String.escapeSingleQuotes(searchString)+'%';
-        return [SELECT Name,Id FROM Pricebook2 WHERE Name LIKE :searchString ORDER BY Name LIMIT 5];
-    }
-    @AuraEnabled(cacheable=true)
-    public static Map<String,String> getStatusPicklistValues(){
-        Map<String,String> pickListValuesList= new Map<String,String>();
-        Schema.DescribeFieldResult StatusField = Contract.Status.getDescribe();
-        List<Schema.PicklistEntry> picklistEntry = StatusField.getPicklistValues();
-        for(Schema.PicklistEntry picklistVal : picklistEntry) {
-            pickListValuesList.put(picklistVal.getLabel(),picklistVal.getValue());
-        }
-        System.debug(pickListValuesList);
-        return pickListValuesList;
-    }
-    @AuraEnabled(cacheable = true)
-    public static void getFieldSetFieldsByFieldSetName ()
-    {
-        List<Schema.FieldSetMember> fieldSetMemberList = (SObjectType.Contract.FieldSets.ContractFieldsSet.getFields());
-        for (Schema.FieldSetMember fieldSetMember : fieldSetMemberList)
-        {
-            System.debug(fieldSetMember);
-        }
-    }
-
 }
